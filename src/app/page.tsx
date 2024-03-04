@@ -1,9 +1,11 @@
-import { UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div className="h-screen">
-      <UserButton />
-    </div>
-  );
+  const { userId } = auth();
+  if (userId) {
+    redirect("/notes");
+  }
+
+  return <div className="h-screen">home</div>;
 }
