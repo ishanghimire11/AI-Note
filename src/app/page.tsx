@@ -1,10 +1,9 @@
-import Image from "next/image";
-import { Input } from "@/components/ui/input";
+import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   return (
-    <h1>
-      <Input />
-    </h1>
+    <div className="h-screen">
+      <UserButton />
+    </div>
   );
 }
