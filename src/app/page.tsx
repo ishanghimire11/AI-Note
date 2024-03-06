@@ -6,6 +6,7 @@ import { LogInIcon } from "lucide-react";
 
 export default function Home() {
   const { userId } = auth();
+
   if (userId) {
     redirect("/notes");
   }

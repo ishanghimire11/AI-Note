@@ -126,7 +126,7 @@ export const CreateNoteDialog = ({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{type} Note</DialogTitle>
+            <DialogTitle className="text-left">{type} Note</DialogTitle>
 
             <Form {...form}>
               <form
@@ -138,7 +138,9 @@ export const CreateNoteDialog = ({
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title</FormLabel>
+                      <FormLabel className="block text-left leading-5">
+                        Title
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Enter your note title" {...field} />
                       </FormControl>
@@ -151,7 +153,9 @@ export const CreateNoteDialog = ({
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Content</FormLabel>
+                      <FormLabel className="block text-left leading-5">
+                        Content
+                      </FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Enter your note content"
