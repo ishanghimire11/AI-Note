@@ -8,10 +8,14 @@ import { PlusIcon } from "lucide-react";
 import CreateNoteDialog from "@/components/CreateNoteDialog";
 import ThemeToggle from "@/components/Themetoggle";
 import Image from "next/image";
+import { dark } from "@clerk/themes";
+import { useTheme } from "next-themes";
 
 export function Navbar() {
   const [openCreateNoteDialog, setOpenCreateNoteDialog] =
     useState<boolean>(false);
+
+  const { theme } = useTheme();
 
   return (
     <>
@@ -33,6 +37,7 @@ export function Navbar() {
             <UserButton
               afterSignOutUrl="/"
               appearance={{
+                baseTheme: theme === "dark" ? dark : undefined,
                 elements: { avatarBox: { width: "2rem", height: "2rem" } },
               }}
             />

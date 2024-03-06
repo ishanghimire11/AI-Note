@@ -5,6 +5,8 @@ import {
 } from "@/lib/validation/validation";
 import { auth } from "@clerk/nextjs";
 import prisma from "@/lib/db/prisma";
+import { getEmbedding } from "@/lib/openai/openai";
+import { notesIndex } from "@/lib/db/pinecone";
 
 export async function POST(req: Request) {
   try {
@@ -23,13 +25,37 @@ export async function POST(req: Request) {
       return Response.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const note = await prisma.note.create({
-      data: {
-        title,
-        content,
-        userId,
-      },
+    const embedding = await getEmbeddingForNote(title, content);
+
+    // Creating a prisma transaction
+
+    const note = await prisma.$transaction(async (transaction) => {
+      const createNote = await transaction.note.create({
+        data: {
+          title,
+          content,
+          userId,
+        },
+      });
+
+      await notesIndex.upsert([
+        {
+          id: createNote.id,
+          values: embedding,
+          metadata: { userId },
+        },
+      ]);
+
+      return createNote;
     });
+
+    // const note = await prisma.note.create({
+    //   data: {
+    //     title,
+    //     content,
+    //     userId,
+    //   },
+    // });
     return Response.json({ note }, { status: 201 });
   } catch (err) {
     console.error(err);
@@ -109,4 +135,11 @@ export async function DELETE(req: Request) {
     console.error(err);
     return Response.json({ error: "Server Error" }, { status: 500 });
   }
+}
+
+async function getEmbeddingForNote(
+  title: string,
+  description: string | undefined,
+) {
+  return getEmbedding(title + "\n\n" + description ?? "");
 }
