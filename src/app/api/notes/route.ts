@@ -4,6 +4,7 @@ import {
   updateNoteSchema,
 } from "@/lib/validation/validation";
 import { auth } from "@clerk/nextjs";
+import prisma from "@/lib/db/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
       return Response.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const note = await prisma?.note.create({
+    const note = await prisma.note.create({
       data: {
         title,
         content,
@@ -47,7 +48,7 @@ export async function PUT(req: Request) {
 
     const { id, title, content } = parsedValue.data;
 
-    const note = await prisma?.note.findUnique({ where: { id } });
+    const note = await prisma.note.findUnique({ where: { id } });
 
     if (!note) {
       return Response.json({ error: "Note not found" }, { status: 404 });
@@ -59,7 +60,7 @@ export async function PUT(req: Request) {
       return Response.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const updatedNote = await prisma?.note.update({
+    const updatedNote = await prisma.note.update({
       where: { id },
       data: {
         title,
@@ -84,7 +85,7 @@ export async function DELETE(req: Request) {
 
     const { id } = parsedValue.data;
 
-    const note = await prisma?.note.findUnique({ where: { id } });
+    const note = await prisma.note.findUnique({ where: { id } });
 
     if (!note) {
       return Response.json({ error: "Note not found" }, { status: 404 });
@@ -96,7 +97,7 @@ export async function DELETE(req: Request) {
       return Response.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const deletedNote = await prisma?.note.delete({
+    const deletedNote = await prisma.note.delete({
       where: { id },
     });
 
