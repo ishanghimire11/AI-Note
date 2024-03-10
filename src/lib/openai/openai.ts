@@ -22,9 +22,5 @@ export async function getEmbedding(text: string) {
     throw new Error("Embedding not found");
   }
 
-  console.log(response, "response");
-  console.log(response.data, "res.data");
-  console.log(response.data[0], "res.data[0]");
-  console.log(embedding);
   return embedding;
 }

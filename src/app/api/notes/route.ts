@@ -49,13 +49,6 @@ export async function POST(req: Request) {
       return createNote;
     });
 
-    // const note = await prisma.note.create({
-    //   data: {
-    //     title,
-    //     content,
-    //     userId,
-    //   },
-    // });
     return Response.json({ note }, { status: 201 });
   } catch (err) {
     console.error(err);
@@ -86,13 +79,35 @@ export async function PUT(req: Request) {
       return Response.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const updatedNote = await prisma.note.update({
-      where: { id },
-      data: {
-        title,
-        content,
-      },
+    const embedding = await getEmbeddingForNote(title, content);
+
+    const updatedNote = await prisma.$transaction(async (tx) => {
+      const updateNote = await tx.note.update({
+        where: { id },
+        data: {
+          title,
+          content,
+        },
+      });
+
+      await notesIndex.upsert([
+        {
+          id: id,
+          values: embedding,
+          metadata: { userId },
+        },
+      ]);
+
+      return updateNote;
     });
+
+    // const updatedNote = await prisma.note.update({
+    //   where: { id },
+    //   data: {
+    //     title,
+    //     content,
+    //   },
+    // });
     return Response.json({ updatedNote }, { status: 200 });
   } catch (err) {
     console.error(err);
@@ -123,8 +138,9 @@ export async function DELETE(req: Request) {
       return Response.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const deletedNote = await prisma.note.delete({
-      where: { id },
+    await prisma.$transaction(async (tx) => {
+      await tx.note.delete({ where: { id } });
+      await notesIndex.deleteOne(id);
     });
 
     return Response.json(
